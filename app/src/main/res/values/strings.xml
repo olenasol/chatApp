@@ -1,0 +1,26 @@
+<resources xmlns:android="http://schemas.android.com/tools">
+    <string name="app_name">ChatApp</string>
+    <string name="chat">Chat</string>
+    <string name="login">Login</string>
+    <string name="password">Password</string>
+    <string name="sign_in">Sign in</string>
+    <string name="log_in">Log in</string>
+    <string name="sign_up">Sign up</string>
+    <string name="about">About</string>
+    <string name="title_activity_sign_up">SignUpActivity</string>
+    <string name="join">Join</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="email">Email</string>
+    <string name="ab">About</string>
+    <string name="settings">Settings</string>
+    <string name="blue">Blue</string>
+    <string name="green">Green</string>
+    <string name="yellow">Yellow</string>
+    <string name="red">Red</string>
+    <string name="CONSUMER_KEY">b9G85NDQvUjo8AnyuxTJHdSxH</string>
+    <string name="CONSUMER_SECRET">	HjYsv9sfTU8oZoIfg2pZGGvw1vmxKH98loQBbe9YxXIshQmQLe
+</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="type_message">type message...</string>
+</resources>
