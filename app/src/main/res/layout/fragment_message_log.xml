@@ -5,11 +5,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.example.olena.chatapp.fragments.MessageLogFragment">
 
+    <TextView
+        android:id="@+id/userNameTxt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        android:background="@color/transparent"
+        app:layout_constraintTop_toBottomOf="parent"
+        />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/messageList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@id/userNameTxt"
+        android:paddingTop="30dp"
         android:paddingBottom="50dp"
         app:layout_constraintBottom_toTopOf="@+id/messageEdit"/>
     <EditText

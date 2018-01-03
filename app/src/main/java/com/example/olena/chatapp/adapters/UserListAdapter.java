@@ -16,14 +16,11 @@ public class UserListAdapter extends RecyclerView.Adapter<UserHolder> {
     private ArrayList<User> listOfUsers;
     private UserItemClickListener onClickListener;
 
-    public ArrayList<User> getListOfUsers() {
-        return listOfUsers;
-    }
-
     public UserListAdapter(ArrayList<User> listOfUsers, UserItemClickListener onClickListener) {
         this.listOfUsers = listOfUsers;
         this.onClickListener = onClickListener;
     }
+
     @Override
     public UserHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return new UserHolder(LayoutInflater.from(parent.getContext())
@@ -31,14 +28,14 @@ public class UserListAdapter extends RecyclerView.Adapter<UserHolder> {
     }
 
     @Override
-    public void onBindViewHolder(UserHolder holder, final int position) {
-        String fullName = listOfUsers.get(position).getUserName()+" "
-                +listOfUsers.get(position).getUserSurname();
-        holder.userNameTxt.setText(fullName);
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
+    public void onBindViewHolder(final UserHolder holder, int position) {
+        String fullName = listOfUsers.get(position).getUserName() + " "
+                + listOfUsers.get(position).getUserSurname();
+        holder.getUserNameTxt().setText(fullName);
+        holder.getCardView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onClickListener.onUserClicked(position);
+                onClickListener.onUserClicked(holder.getAdapterPosition());
             }
         });
     }

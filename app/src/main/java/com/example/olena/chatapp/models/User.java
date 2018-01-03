@@ -7,7 +7,7 @@ import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 
-public class User implements Parcelable,Comparable<User>{
+public class User implements Parcelable, Comparable<User> {
     private String userName;
     private String userSurname;
     private ArrayList<Message> listOfMessages;
@@ -17,14 +17,18 @@ public class User implements Parcelable,Comparable<User>{
         this.userSurname = userSurname;
         listOfMessages = new ArrayList<>();
     }
+
     private User(Parcel in) {
         this.userName = in.readString();
         this.userSurname = in.readString();
+
+        //noinspection unchecked
         this.listOfMessages = in.readArrayList(null);
 
 
     }
-    public void addMessageToList(Message message){
+
+    public void addMessageToList(Message message) {
         listOfMessages.add(message);
     }
 
@@ -63,6 +67,7 @@ public class User implements Parcelable,Comparable<User>{
         dest.writeString(this.userSurname);
         dest.writeList(this.listOfMessages);
     }
+
     public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
         public User createFromParcel(Parcel in) {
             return new User(in);

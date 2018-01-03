@@ -1,24 +1,22 @@
-package com.example.olena.chatapp.additional_classes;
+package com.example.olena.chatapp.utils;
 
 import android.app.Activity;
 
 import com.example.olena.chatapp.R;
 
-public class Utils
-{
+public class Utils {
     private static int sTheme;
     public final static int THEME_DEFAULT = 0;
     public final static int THEME_GREEN = 1;
     public final static int THEME_YELLOW = 2;
     public final static int THEME_RED = 3;
-    public static void changeToTheme(int theme)
-    {
+
+    public static void changeToTheme(int theme) {
         sTheme = theme;
     }
-    public static void onActivityCreateSetTheme(Activity activity)
-    {
-        switch (sTheme)
-        {
+
+    public static void onActivityCreateSetTheme(Activity activity) {
+        switch (sTheme) {
             default:
             case THEME_DEFAULT:
                 activity.setTheme(R.style.AppTheme);
@@ -35,7 +33,5 @@ public class Utils
         }
     }
 
-    public static int getTheme() {
-        return sTheme;
-    }
+
 }

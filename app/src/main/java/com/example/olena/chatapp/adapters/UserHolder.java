@@ -8,10 +8,20 @@ import android.widget.TextView;
 
 import com.example.olena.chatapp.R;
 
-public class UserHolder extends RecyclerView.ViewHolder {
+class UserHolder extends RecyclerView.ViewHolder {
 
-    TextView userNameTxt;
-    CardView cardView;
+    private TextView userNameTxt;
+    private CardView cardView;
+
+    TextView getUserNameTxt() {
+        return userNameTxt;
+    }
+
+
+    CardView getCardView() {
+        return cardView;
+    }
+
 
     UserHolder(View itemView) {
         super(itemView);

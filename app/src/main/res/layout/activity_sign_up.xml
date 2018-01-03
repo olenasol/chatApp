@@ -20,6 +20,7 @@
         android:layout_marginTop="10dp"
         android:background="#00000000"
         android:padding="5dp"
+        android:contentDescription="@string/go_back_btn"
         android:src="@drawable/ic_reply_black_24dp"
         />
     <android.support.constraint.ConstraintLayout
@@ -88,7 +89,6 @@
             app:layout_constraintTop_toBottomOf="@+id/passwordRepeatEditUp"
             />
         <Button
-            android:id="@+id/joinBtn"
             android:layout_width="wrap_content"
             android:layout_height="30dp"
             android:background="@drawable/rounded_edges"

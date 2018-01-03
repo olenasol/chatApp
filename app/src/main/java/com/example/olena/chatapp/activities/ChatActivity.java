@@ -10,7 +10,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -18,16 +17,15 @@ import android.widget.Toast;
 
 import com.example.olena.chatapp.R;
 import com.example.olena.chatapp.adapters.MessageListAdapter;
-import com.example.olena.chatapp.additional_classes.Utils;
+import com.example.olena.chatapp.utils.Utils;
 import com.example.olena.chatapp.dataproviders.UserProvider;
 import com.example.olena.chatapp.fragments.MessageLogFragment;
 import com.example.olena.chatapp.fragments.UserListFragment;
 import com.example.olena.chatapp.models.Message;
 import com.example.olena.chatapp.services.NotificationService;
+import com.example.olena.chatapp.sociallogins.GoogleLogin;
+import com.example.olena.chatapp.sociallogins.InstagramLogin;
 import com.example.olena.chatapp.utils.Constants;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.steelkiwi.instagramhelper.model.InstagramUser;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.TwitterCore;
@@ -43,12 +41,10 @@ public class ChatActivity extends AppCompatActivity {
     private UserListFragment userListFragment;
     private MessageLogFragment messageLogFragment;
     private ArrayList<com.example.olena.chatapp.models.User> listOfUsers = new ArrayList<>();
-    private BroadcastReceiver broadcastReceiver;
 
     public ArrayList<com.example.olena.chatapp.models.User> getListOfUsers() {
         return listOfUsers;
     }
-
 
 
     public void setMessageLogFragment(MessageLogFragment messageLogFragment) {
@@ -61,22 +57,17 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
         getAccountName();
-        broadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                String msg=intent.getStringExtra(Constants.BROADCAST_MESSAGE);
-                addMessage(msg);
-            }
-        };
-        IntentFilter intentFilter=new IntentFilter(Constants.BROADCAST_TEXT);
-        registerReceiver(broadcastReceiver,intentFilter);
+
         if (savedInstanceState != null) {
 
             Fragment fragment = getSupportFragmentManager().getFragment(savedInstanceState,
                     Constants.LIST_FRAGMENT);
             if (fragment instanceof UserListFragment) {
                 userListFragment = (UserListFragment) fragment;
-                listOfUsers = userListFragment.getListOfUsers();
+
+            }
+            if (savedInstanceState.getParcelableArrayList(Constants.LIST_OF_USERS) != null) {
+                listOfUsers = savedInstanceState.getParcelableArrayList(Constants.LIST_OF_USERS);
             }
         } else {
             startListOfUsersFragment();
@@ -84,42 +75,38 @@ public class ChatActivity extends AppCompatActivity {
             //addMessage();
             startService(new Intent(this, NotificationService.class));
         }
+        BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String msg = intent.getStringExtra(Constants.BROADCAST_MESSAGE);
+                addMessage(msg);
+            }
+        };
+        IntentFilter intentFilter = new IntentFilter(Constants.BROADCAST_TEXT);
+        registerReceiver(broadcastReceiver, intentFilter);
     }
 
     private void getAccountName() {
         int typeLogin = getIntent().getIntExtra(Constants.TYPE_LOGIN, 0);
+        String toastText = "";
         switch (typeLogin) {
             case 1:
-                getNameGmail();
+                toastText = new GoogleLogin().getNameGmail(ChatActivity.this);
                 break;
             case 2:
                 getNameTwitter();
                 break;
             case 3:
-                getNameInstagram();
+                toastText = new InstagramLogin().getNameInstagram(ChatActivity.this);
                 break;
         }
+        Toast.makeText(this, toastText, Toast.LENGTH_LONG).show();
     }
 
-    private void getNameInstagram() {
-        if (LoginActivity.instagramHelper != null) {
-            InstagramUser user = LoginActivity.instagramHelper.getInstagramUser(this);
-
-            Toast.makeText(this, "Instagram: " + user.getData().getUsername(), Toast.LENGTH_LONG).show();
-
-        }
-    }
-
-    private void getNameGmail() {
-        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
-        if (acct != null) {
-            String personName = acct.getDisplayName();
-            Toast.makeText(this, "Gmail: " + personName, Toast.LENGTH_LONG).show();
-        }
-    }
 
     private void getNameTwitter() {
-        Call<User> user = TwitterCore.getInstance().getApiClient().getAccountService().verifyCredentials(false, false, false);
+        Call<User> user = TwitterCore.getInstance().getApiClient().getAccountService().
+                verifyCredentials(false, false, false);
         user.enqueue(new Callback<User>() {
             @Override
             public void success(Result<User> userResult) {
@@ -129,7 +116,7 @@ public class ChatActivity extends AppCompatActivity {
 
             @Override
             public void failure(TwitterException exc) {
-                Log.d("TwitterKit", "Verify Credentials Failure", exc);
+
             }
         });
 
@@ -165,15 +152,18 @@ public class ChatActivity extends AppCompatActivity {
         relativeLayout.setVisibility(View.VISIBLE);
     }
 
-    @Override
-    public void onBackPressed() {
+    private void setUserFragmentMaxWidth() {
         RelativeLayout relativeLayout = findViewById(R.id.fragment_container);
         relativeLayout.setVisibility(View.VISIBLE);
         LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT
         );
+        relativeLayout.setLayoutParams(param);
+    }
 
+    @Override
+    public void onBackPressed() {
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             if (messageLogFragment != null && messageLogFragment.isVisible()) {
@@ -181,7 +171,7 @@ public class ChatActivity extends AppCompatActivity {
             }
             if (userListFragment != null && userListFragment.isHidden()) {
                 getSupportFragmentManager().beginTransaction().addToBackStack(null).show(userListFragment).commit();
-                relativeLayout.setLayoutParams(param);
+                setUserFragmentMaxWidth();
             }
             if (userListFragment != null && userListFragment.isVisible()) {
                 startActivity(new Intent(ChatActivity.this, LoginActivity.class));
@@ -197,13 +187,12 @@ public class ChatActivity extends AppCompatActivity {
         super.onConfigurationChanged(newConfig);
 
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            if(messageLogFragment!=null) {
+            if (messageLogFragment != null) {
                 getSupportFragmentManager().beginTransaction().show(userListFragment).show(messageLogFragment).commit();
             }
 
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
             getSupportFragmentManager().beginTransaction().addToBackStack(null).hide(userListFragment).commit();
-
         }
     }
 
@@ -259,6 +248,7 @@ public class ChatActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         getSupportFragmentManager().putFragment(outState, Constants.LIST_FRAGMENT,
                 userListFragment);
+        outState.putParcelableArrayList(Constants.LIST_OF_USERS, listOfUsers);
     }
 
     @Override

@@ -22,19 +22,15 @@ import com.example.olena.chatapp.utils.Constants;
 import java.util.ArrayList;
 
 
-public class UserListFragment extends Fragment implements UserItemClickListener{
+public class UserListFragment extends Fragment implements UserItemClickListener {
 
     private RecyclerView recyclerView;
     private ArrayList<User> listOfUsers;
-    private RelativeLayout relativeLayout;
 
     public UserListFragment() {
         // Required empty public constructor
     }
 
-    public ArrayList<User> getListOfUsers() {
-        return listOfUsers;
-    }
 
     @Override
 
@@ -42,44 +38,42 @@ public class UserListFragment extends Fragment implements UserItemClickListener{
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_user_list, container, false);
         recyclerView = view.findViewById(R.id.userList);
-        relativeLayout = getActivity().findViewById(R.id.fragment_container2);
+
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         if (savedInstanceState != null) {
             if (savedInstanceState.getParcelableArrayList(Constants.LIST_OF_USERS) != null) {
                 listOfUsers = savedInstanceState.getParcelableArrayList(Constants.LIST_OF_USERS);
             }
-        }
-        else {
-            listOfUsers = ((ChatActivity)getActivity()).getListOfUsers();
+
+        } else {
+            listOfUsers = ((ChatActivity) getActivity()).getListOfUsers();
 
         }
-        UserListAdapter userListAdapter = new UserListAdapter(listOfUsers,UserListFragment.this);
+        UserListAdapter userListAdapter = new UserListAdapter(listOfUsers, UserListFragment.this);
         recyclerView.setAdapter(userListAdapter);
         return view;
     }
 
 
-
-
     @Override
     public void onUserClicked(int position) {
-        MessageLogFragment messageLogFragment = MessageLogFragment.newInstance(listOfUsers.get(position),this);
-        ((ChatActivity)getActivity()).setMessageLogFragment(messageLogFragment);
+        MessageLogFragment messageLogFragment = MessageLogFragment.newInstance(listOfUsers.get(position), this);
+        ((ChatActivity) getActivity()).setMessageLogFragment(messageLogFragment);
 
-        if(getResources().getConfiguration().orientation==Configuration.ORIENTATION_PORTRAIT){
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             getFragmentManager().beginTransaction().addToBackStack(null).hide(this).commit();
 
             ((ChatActivity) getActivity()).setMessageListVisible();
             ((ChatActivity) getActivity()).startListOfMessagesFragment(messageLogFragment);
-        }
-        else {
-        getFragmentManager()
+        } else {
+            getFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment_container2, messageLogFragment)
                     .commit();
 
         }
     }
+
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -87,17 +81,18 @@ public class UserListFragment extends Fragment implements UserItemClickListener{
         outState.putParcelableArrayList(Constants.LIST_OF_USERS, listOfUsers);
 
     }
-    public void changeListOfUsers(User user){
-        if(listOfUsers!=null) {
+
+    public void changeListOfUsers(User user) {
+        if (listOfUsers != null) {
             int index = listOfUsers.indexOf(user);
             listOfUsers.remove(index);
             listOfUsers.add(0, user);
 
             //recyclerView.setAdapter(new UserListAdapter(listOfUsers,UserListFragment.this));
-            recyclerView.getAdapter().notifyItemMoved(index,0);
+            recyclerView.getAdapter().notifyItemMoved(index, 0);
             //
             // recyclerView.getAdapter().notifyItemChanged(0);
-            for(int i=0;i<=index;i++){
+            for (int i = 0; i <= index; i++) {
                 recyclerView.getAdapter().notifyItemChanged(i);
             }
 

@@ -14,5 +14,5 @@ public class Constants {
     public static final String BROADCAST_TEXT = "com.example.olena.chatapp.message";
     public static final String BROADCAST_MESSAGE = "message";
     public static final int NUMBER_OF_NOTIFICATIONS = 5;
-
+    public static final int RC_SIGN_IN = 9001;
 }

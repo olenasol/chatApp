@@ -1,79 +1,48 @@
 package com.example.olena.chatapp.activities;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Build;
-import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.olena.chatapp.R;
-import com.example.olena.chatapp.additional_classes.Utils;
+import com.example.olena.chatapp.utils.Utils;
+import com.example.olena.chatapp.sociallogins.GoogleLogin;
+import com.example.olena.chatapp.sociallogins.InstagramLogin;
+import com.example.olena.chatapp.sociallogins.TwitterLogin;
 import com.example.olena.chatapp.utils.Constants;
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.SignInButton;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.squareup.picasso.Picasso;
-import com.steelkiwi.instagramhelper.InstagramHelper;
 import com.steelkiwi.instagramhelper.InstagramHelperConstants;
-import com.steelkiwi.instagramhelper.model.InstagramUser;
 import com.twitter.sdk.android.core.Callback;
-import com.twitter.sdk.android.core.DefaultLogger;
 import com.twitter.sdk.android.core.Result;
-import com.twitter.sdk.android.core.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
-import com.twitter.sdk.android.core.TwitterAuthToken;
-import com.twitter.sdk.android.core.TwitterConfig;
-import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private TextView signUpTxt;
-    private TextView aboutTxt;
-    private TextView settingsTxt;
-    private SignInButton googleSignInButton;
     private TwitterLoginButton twitterLoginButton;
-    private Button instagramButton;
-    private static final int RC_SIGN_IN = 9001;
-    private GoogleSignInClient mGoogleApiClient;
-    public static InstagramHelper instagramHelper;
+    private TwitterLogin twitterLogin;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Utils.onActivityCreateSetTheme(this);
-        initializeTwitter();
+        twitterLogin = new TwitterLogin(LoginActivity.this);
+        twitterLogin.initializeTwitter();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        //signOutGoogle();
-       // logoutTwitter();
 
-        aboutTxt = findViewById(R.id.aboutLink);
-        signUpTxt = findViewById(R.id.signUpTxt);
-        settingsTxt = findViewById(R.id.settingsLink);
-        googleSignInButton = findViewById(R.id.google_sign_in_button);
+        TextView aboutTxt = findViewById(R.id.aboutLink);
+        TextView signUpTxt = findViewById(R.id.signUpTxt);
+        TextView settingsTxt = findViewById(R.id.settingsLink);
+        SignInButton googleSignInButton = findViewById(R.id.google_sign_in_button);
         twitterLoginButton = findViewById(R.id.twitter_login_button);
-        instagramButton = findViewById(R.id.instagramBtn);
+        Button instagramButton = findViewById(R.id.instagramBtn);
         aboutTxt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -96,129 +65,61 @@ public class LoginActivity extends AppCompatActivity {
         googleSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                signInWithGoogle();
+                new GoogleLogin().signInWithGoogle(LoginActivity.this);
             }
         });
         signInWithTwitter();
         instagramButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                signInWithInstagram();
+                new InstagramLogin().signInWithInstagram(LoginActivity.this);
             }
         });
     }
 
-    private void signInWithInstagram() {
-        String scope = "basic+public_content+follower_list+comments+relationships+likes";
-        instagramHelper = new InstagramHelper.Builder()
-                .withClientId(Constants.TWITTER_CLIENT_ID)
-                .withRedirectUrl(Constants.TWITTER_CALLBACK)
-                .withScope(scope)
-                .build();
-        instagramHelper.loginFromActivity(LoginActivity.this);
-    }
 
     private void signInWithTwitter() {
         twitterLoginButton.setCallback(new Callback<TwitterSession>() {
             @Override
             public void success(Result<TwitterSession> result) {
-                TwitterSession session = TwitterCore.getInstance().getSessionManager().getActiveSession();
-                TwitterAuthToken authToken = session.getAuthToken();
-                String token = authToken.token;
-                String secret = authToken.secret;
+                twitterLogin.getTwitterSuccessCallback();
                 updateUI(2);
             }
 
             @Override
             public void failure(TwitterException exception) {
-                Toast.makeText(LoginActivity.this,"Error Twitter Sign in",Toast.LENGTH_LONG).show();
+                Toast.makeText(LoginActivity.this, "Error Twitter Sign in", Toast.LENGTH_LONG).show();
             }
         });
-    }
-
-
-    private void initializeTwitter() {
-        TwitterConfig config = new TwitterConfig.Builder(this)
-                .logger(new DefaultLogger(Log.DEBUG))
-                .twitterAuthConfig(new TwitterAuthConfig(getString(R.string.CONSUMER_KEY),
-                        getString(R.string.CONSUMER_SECRET)))
-                .debug(true)
-                .build();
-        Twitter.initialize(config);
-    }
-
-    private void signInWithGoogle() {
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-        mGoogleApiClient = GoogleSignIn.getClient(this, gso);
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        Intent signInIntent = mGoogleApiClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == RESULT_OK) {
-            if (requestCode == RC_SIGN_IN) {
-                Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-                handleSignInResult(task);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == Constants.RC_SIGN_IN) {
+                updateUI(1);
             }
             if (TwitterAuthConfig.DEFAULT_AUTH_REQUEST_CODE == requestCode) {
                 twitterLoginButton.onActivityResult(requestCode, resultCode, data);
             }
             if (requestCode == InstagramHelperConstants.INSTA_LOGIN) {
                 updateUI(3);
-               // InstagramUser user = instagramHelper.getInstagramUser(this);
-
-               // Toast.makeText(this,user.getData().getUsername(),Toast.LENGTH_LONG).show();
             }
-        }
-    }
-
-    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
-        try {
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-
-            updateUI(1);
-        } catch (ApiException e) {
-           // updateUI();
-            Toast.makeText(this,"Error Google Sign in",Toast.LENGTH_LONG).show();
-        }
-    }
-
-    private void signOutGoogle() {
-        if(mGoogleApiClient!=null)
-        mGoogleApiClient.signOut()
-                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        // ...
-                    }
-                });
-
-    }
-    public void logoutTwitter() {
-        TwitterSession twitterSession = TwitterCore.getInstance().getSessionManager().getActiveSession();
-        if (twitterSession != null) {
-            ClearCookies(getApplicationContext());
-            TwitterCore.getInstance().getSessionManager().clearActiveSession();
-        }
-    }
-
-    public static void ClearCookies(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            CookieManager.getInstance().removeAllCookies(null);
-            CookieManager.getInstance().flush();
         }
     }
 
     private void updateUI(int typeOfLogin) {
         Intent intent = new Intent(LoginActivity.this, ChatActivity.class);
-        intent.putExtra(Constants.TYPE_LOGIN,typeOfLogin);
+        intent.putExtra(Constants.TYPE_LOGIN, typeOfLogin);
         startActivity(intent);
     }
 
-
+    @Override
+    public void onBackPressed() {
+        Intent a = new Intent(Intent.ACTION_MAIN);
+        a.addCategory(Intent.CATEGORY_HOME);
+        a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(a);
+    }
 }

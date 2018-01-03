@@ -1,8 +1,6 @@
 package com.example.olena.chatapp.activities;
 
 import android.content.Intent;
-import android.content.res.Resources;
-import android.media.audiofx.Equalizer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -11,7 +9,7 @@ import android.widget.ImageButton;
 import android.widget.RadioButton;
 
 import com.example.olena.chatapp.R;
-import com.example.olena.chatapp.additional_classes.Utils;
+import com.example.olena.chatapp.utils.Utils;
 
 public class SettingsActivity extends AppCompatActivity {
 

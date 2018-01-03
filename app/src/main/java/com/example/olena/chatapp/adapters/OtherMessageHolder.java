@@ -7,9 +7,17 @@ import android.widget.TextView;
 
 import com.example.olena.chatapp.R;
 
-public class OtherMessageHolder extends RecyclerView.ViewHolder{
-    TextView messageTxt;
-    TextView timeTxt;
+class OtherMessageHolder extends RecyclerView.ViewHolder {
+    private TextView messageTxt;
+    private TextView timeTxt;
+
+    TextView getMessageTxt() {
+        return messageTxt;
+    }
+
+    TextView getTimeTxt() {
+        return timeTxt;
+    }
 
     OtherMessageHolder(View itemView) {
         super(itemView);
