@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,7 +33,12 @@ public class UserListFragment extends Fragment implements UserItemClickListener{
         // Required empty public constructor
     }
 
+    public ArrayList<User> getListOfUsers() {
+        return listOfUsers;
+    }
+
     @Override
+
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_user_list, container, false);
@@ -46,12 +52,10 @@ public class UserListFragment extends Fragment implements UserItemClickListener{
         }
         else {
             listOfUsers = ((ChatActivity)getActivity()).getListOfUsers();
-           // listOfUsers.get(0).setListOfMessages(new MessageProvider().getListOfMessages());
-//            for (int i=0;i<10;i++) {
-//                addMessage();
-//            }
+
         }
-        recyclerView.setAdapter(new UserListAdapter(listOfUsers,UserListFragment.this));
+        UserListAdapter userListAdapter = new UserListAdapter(listOfUsers,UserListFragment.this);
+        recyclerView.setAdapter(userListAdapter);
         return view;
     }
 
@@ -89,7 +93,12 @@ public class UserListFragment extends Fragment implements UserItemClickListener{
             int index = listOfUsers.indexOf(user);
             listOfUsers.remove(index);
             listOfUsers.add(0, user);
-            recyclerView.getAdapter().notifyDataSetChanged();
+
+            //recyclerView.setAdapter(new UserListAdapter(listOfUsers,UserListFragment.this));
+            recyclerView.getAdapter().notifyItemMoved(index,0);
+            recyclerView.getAdapter().notifyItemChanged(0);
+           // recyclerView.getAdapter().notifyDataSetChanged();
+            recyclerView.getLayoutManager().scrollToPosition(0);
         }
     }
 }

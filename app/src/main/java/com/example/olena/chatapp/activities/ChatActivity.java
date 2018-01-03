@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.renderscript.RenderScript;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -35,6 +36,7 @@ import com.example.olena.chatapp.models.Message;
 import com.example.olena.chatapp.utils.Constants;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.steelkiwi.instagramhelper.model.InstagramUser;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.Result;
 import com.twitter.sdk.android.core.Twitter;
@@ -79,19 +81,45 @@ public class ChatActivity extends AppCompatActivity {
         Utils.onActivityCreateSetTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-        if(getResources().getConfiguration().orientation==Configuration.ORIENTATION_PORTRAIT){
+        getAccountName();
 
-        }
-        //getNameGmail();
-        getNameTwitter();
         mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        startListOfUsersFragment();
-        listOfUsers = new UserProvider().getListOfUsers();
-        addMessage();
+        if (savedInstanceState != null) {
+
+            Fragment fragment = getSupportFragmentManager().getFragment(savedInstanceState,
+                    Constants.LIST_FRAGMENT);
+            if (fragment instanceof UserListFragment) {
+                userListFragment = (UserListFragment) fragment;
+                listOfUsers = userListFragment.getListOfUsers();
+            }
+        } else {
+            startListOfUsersFragment();
+            listOfUsers = new UserProvider().getListOfUsers();
+            addMessage();
+        }
 
 
     }
+
+    private void getAccountName() {
+        int typeLogin = getIntent().getIntExtra(Constants.TYPE_LOGIN,0);
+        switch (typeLogin) {
+            case 1: getNameGmail();break;
+            case 2: getNameTwitter();break;
+            case 3: getNameInstagram(); break;
+        }
+    }
+
+    private void getNameInstagram() {
+        if(LoginActivity.instagramHelper!=null) {
+            InstagramUser user = LoginActivity.instagramHelper.getInstagramUser(this);
+
+            Toast.makeText(this,"Instagram: " + user.getData().getUsername(), Toast.LENGTH_LONG).show();
+
+        }
+    }
+
     private void getNameGmail(){
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
         if (acct != null) {
@@ -178,6 +206,7 @@ public class ChatActivity extends AppCompatActivity {
         super.onConfigurationChanged(newConfig);
 
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            getSupportFragmentManager().beginTransaction().show(userListFragment).show(messageLogFragment).commit();
 
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
             getSupportFragmentManager().beginTransaction().addToBackStack(null).hide(userListFragment).commit();
@@ -198,7 +227,7 @@ public class ChatActivity extends AppCompatActivity {
         TimerTask hourlyTask = new TimerTask () {
             @Override
             public void run () {
-                final String message = "Hello";
+                final String message = "Hello" + countAddedMessages;
 
                 final int index = getUserInd();
                 addMessageToView(index,message);
@@ -268,8 +297,13 @@ public class ChatActivity extends AppCompatActivity {
                         .setSound(uri);
         Notification notification=mBuilder.build();
 
-        //mNotificationManager.notify(Constants.NOTIFICATION_ID,notification);
+        mNotificationManager.notify(Constants.NOTIFICATION_ID,notification);
 
     }
 
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        getSupportFragmentManager().putFragment(outState, Constants.LIST_FRAGMENT,
+                userListFragment);
+    }
 }

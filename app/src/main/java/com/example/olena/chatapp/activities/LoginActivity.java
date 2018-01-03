@@ -13,11 +13,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.olena.chatapp.R;
 import com.example.olena.chatapp.additional_classes.Utils;
+import com.example.olena.chatapp.utils.Constants;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -29,6 +31,10 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.squareup.picasso.Picasso;
+import com.steelkiwi.instagramhelper.InstagramHelper;
+import com.steelkiwi.instagramhelper.InstagramHelperConstants;
+import com.steelkiwi.instagramhelper.model.InstagramUser;
 import com.twitter.sdk.android.core.Callback;
 import com.twitter.sdk.android.core.DefaultLogger;
 import com.twitter.sdk.android.core.Result;
@@ -48,8 +54,10 @@ public class LoginActivity extends AppCompatActivity {
     private TextView settingsTxt;
     private SignInButton googleSignInButton;
     private TwitterLoginButton twitterLoginButton;
+    private Button instagramButton;
     private static final int RC_SIGN_IN = 9001;
     private GoogleSignInClient mGoogleApiClient;
+    public static InstagramHelper instagramHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +73,7 @@ public class LoginActivity extends AppCompatActivity {
         settingsTxt = findViewById(R.id.settingsLink);
         googleSignInButton = findViewById(R.id.google_sign_in_button);
         twitterLoginButton = findViewById(R.id.twitter_login_button);
+        instagramButton = findViewById(R.id.instagramBtn);
         aboutTxt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -91,7 +100,22 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
         signInWithTwitter();
+        instagramButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signInWithInstagram();
+            }
+        });
+    }
 
+    private void signInWithInstagram() {
+        String scope = "basic+public_content+follower_list+comments+relationships+likes";
+        instagramHelper = new InstagramHelper.Builder()
+                .withClientId(Constants.TWITTER_CLIENT_ID)
+                .withRedirectUrl(Constants.TWITTER_CALLBACK)
+                .withScope(scope)
+                .build();
+        instagramHelper.loginFromActivity(LoginActivity.this);
     }
 
     private void signInWithTwitter() {
@@ -102,7 +126,7 @@ public class LoginActivity extends AppCompatActivity {
                 TwitterAuthToken authToken = session.getAuthToken();
                 String token = authToken.token;
                 String secret = authToken.secret;
-                updateUI();
+                updateUI(2);
             }
 
             @Override
@@ -144,6 +168,12 @@ public class LoginActivity extends AppCompatActivity {
             if (TwitterAuthConfig.DEFAULT_AUTH_REQUEST_CODE == requestCode) {
                 twitterLoginButton.onActivityResult(requestCode, resultCode, data);
             }
+            if (requestCode == InstagramHelperConstants.INSTA_LOGIN) {
+                updateUI(3);
+               // InstagramUser user = instagramHelper.getInstagramUser(this);
+
+               // Toast.makeText(this,user.getData().getUsername(),Toast.LENGTH_LONG).show();
+            }
         }
     }
 
@@ -151,9 +181,9 @@ public class LoginActivity extends AppCompatActivity {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
 
-            updateUI();
+            updateUI(1);
         } catch (ApiException e) {
-            updateUI();
+           // updateUI();
             Toast.makeText(this,"Error Google Sign in",Toast.LENGTH_LONG).show();
         }
     }
@@ -184,8 +214,10 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void updateUI() {
-        startActivity(new Intent(LoginActivity.this, ChatActivity.class));
+    private void updateUI(int typeOfLogin) {
+        Intent intent = new Intent(LoginActivity.this, ChatActivity.class);
+        intent.putExtra(Constants.TYPE_LOGIN,typeOfLogin);
+        startActivity(intent);
     }
 
 
