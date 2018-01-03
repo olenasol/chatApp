@@ -14,6 +14,5 @@ public class IncommingMessageHolder extends RecyclerView.ViewHolder{
         super(itemView);
         messageTxt = itemView.findViewById(R.id.messageTextView);
         timeTxt = itemView.findViewById(R.id.timeTextView);
-
     }
 }

@@ -11,6 +11,7 @@ public class Message implements Parcelable {
     private String time;
     private boolean fromMe;
 
+
     public Message(String message, boolean fromMe) {
         this.message = message;
         SimpleDateFormat sdf=new SimpleDateFormat("HH : mm : ss");

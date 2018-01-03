@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -96,8 +95,12 @@ public class UserListFragment extends Fragment implements UserItemClickListener{
 
             //recyclerView.setAdapter(new UserListAdapter(listOfUsers,UserListFragment.this));
             recyclerView.getAdapter().notifyItemMoved(index,0);
-            recyclerView.getAdapter().notifyItemChanged(0);
-           // recyclerView.getAdapter().notifyDataSetChanged();
+            //
+            // recyclerView.getAdapter().notifyItemChanged(0);
+            for(int i=0;i<=index;i++){
+                recyclerView.getAdapter().notifyItemChanged(i);
+            }
+
             recyclerView.getLayoutManager().scrollToPosition(0);
         }
     }

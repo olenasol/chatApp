@@ -16,6 +16,10 @@ public class UserListAdapter extends RecyclerView.Adapter<UserHolder> {
     private ArrayList<User> listOfUsers;
     private UserItemClickListener onClickListener;
 
+    public ArrayList<User> getListOfUsers() {
+        return listOfUsers;
+    }
+
     public UserListAdapter(ArrayList<User> listOfUsers, UserItemClickListener onClickListener) {
         this.listOfUsers = listOfUsers;
         this.onClickListener = onClickListener;

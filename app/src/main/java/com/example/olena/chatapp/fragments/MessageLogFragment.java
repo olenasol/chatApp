@@ -69,14 +69,6 @@ public class MessageLogFragment extends Fragment {
         }
         recyclerView.setAdapter(new MessageListAdapter(listOfMessages));
         recyclerView.getLayoutManager().scrollToPosition(listOfMessages.size() - 1);
-        messageEdit.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    v.setBackgroundColor(Color.RED);
-                }
-            }
-        });
 
         messageEdit.setOnKeyListener(new View.OnKeyListener() {
             @Override
