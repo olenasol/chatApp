@@ -9,6 +9,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.olena.chatapp.R;
+import com.example.olena.chatapp.services.NotificationService;
 import com.example.olena.chatapp.utils.Utils;
 import com.example.olena.chatapp.sociallogins.GoogleLogin;
 import com.example.olena.chatapp.sociallogins.InstagramLogin;
@@ -117,6 +118,7 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        stopService(new Intent(this, NotificationService.class));
         Intent a = new Intent(Intent.ACTION_MAIN);
         a.addCategory(Intent.CATEGORY_HOME);
         a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

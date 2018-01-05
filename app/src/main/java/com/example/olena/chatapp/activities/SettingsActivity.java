@@ -1,6 +1,8 @@
 package com.example.olena.chatapp.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -9,6 +11,7 @@ import android.widget.ImageButton;
 import android.widget.RadioButton;
 
 import com.example.olena.chatapp.R;
+import com.example.olena.chatapp.utils.Constants;
 import com.example.olena.chatapp.utils.Utils;
 
 public class SettingsActivity extends AppCompatActivity {
@@ -35,11 +38,14 @@ public class SettingsActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(SettingsActivity.this);
+        final SharedPreferences.Editor editor = preferences.edit();
         greenRadioBtn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (greenRadioBtn.isChecked()) {
-                    Utils.changeToTheme(Utils.THEME_GREEN);
+
+                    editor.putInt(Constants.THEME_NUMBER,Utils.THEME_GREEN).apply();
                     startActivity(new Intent(SettingsActivity.this, LoginActivity.class));
                 }
             }
@@ -48,7 +54,7 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (yellowRadioBtn.isChecked()) {
-                    Utils.changeToTheme(Utils.THEME_YELLOW);
+                    editor.putInt(Constants.THEME_NUMBER,Utils.THEME_YELLOW).apply();
                     startActivity(new Intent(SettingsActivity.this, LoginActivity.class));
                 }
             }
@@ -57,7 +63,7 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (blueRadioBtn.isChecked()) {
-                    Utils.changeToTheme(Utils.THEME_DEFAULT);
+                    editor.putInt(Constants.THEME_NUMBER,Utils.THEME_DEFAULT).apply();
                     startActivity(new Intent(SettingsActivity.this, LoginActivity.class));
                 }
             }
@@ -66,7 +72,7 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (redRadioBtn.isChecked()) {
-                    Utils.changeToTheme(Utils.THEME_RED);
+                    editor.putInt(Constants.THEME_NUMBER,Utils.THEME_RED).apply();
                     startActivity(new Intent(SettingsActivity.this, LoginActivity.class));
                 }
             }

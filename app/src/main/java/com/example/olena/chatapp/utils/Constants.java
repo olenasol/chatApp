@@ -15,4 +15,5 @@ public class Constants {
     public static final String BROADCAST_MESSAGE = "message";
     public static final int NUMBER_OF_NOTIFICATIONS = 5;
     public static final int RC_SIGN_IN = 9001;
+    public static final String THEME_NUMBER = "Theme";
 }

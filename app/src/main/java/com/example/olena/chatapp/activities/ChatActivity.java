@@ -75,6 +75,12 @@ public class ChatActivity extends AppCompatActivity {
             //addMessage();
             startService(new Intent(this, NotificationService.class));
         }
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -249,6 +255,12 @@ public class ChatActivity extends AppCompatActivity {
         getSupportFragmentManager().putFragment(outState, Constants.LIST_FRAGMENT,
                 userListFragment);
         outState.putParcelableArrayList(Constants.LIST_OF_USERS, listOfUsers);
+    }
+
+    @Override
+    protected void onStop() {
+        stopService(new Intent(this, NotificationService.class));
+        super.onStop();
     }
 
     @Override
