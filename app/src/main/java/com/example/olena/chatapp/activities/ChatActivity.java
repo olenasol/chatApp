@@ -62,13 +62,20 @@ public class ChatActivity extends AppCompatActivity {
 
             Fragment fragment = getSupportFragmentManager().getFragment(savedInstanceState,
                     Constants.LIST_FRAGMENT);
-            if (fragment instanceof UserListFragment) {
-                userListFragment = (UserListFragment) fragment;
-
-            }
+            Fragment messageFragment = getSupportFragmentManager().getFragment(savedInstanceState,
+                    Constants.MESSAGE_FRAGMENT);
+            if(fragment!=null)
+                if (fragment instanceof UserListFragment) {
+                    userListFragment = (UserListFragment) fragment;
+                }
+            if(messageFragment!=null)
+                if(messageFragment instanceof MessageLogFragment){
+                    messageLogFragment = (MessageLogFragment) messageFragment;
+                }
             if (savedInstanceState.getParcelableArrayList(Constants.LIST_OF_USERS) != null) {
                 listOfUsers = savedInstanceState.getParcelableArrayList(Constants.LIST_OF_USERS);
             }
+
         } else {
             startListOfUsersFragment();
             listOfUsers = new UserProvider().getListOfUsers();
@@ -158,12 +165,33 @@ public class ChatActivity extends AppCompatActivity {
         relativeLayout.setVisibility(View.VISIBLE);
     }
 
+
     private void setUserFragmentMaxWidth() {
         RelativeLayout relativeLayout = findViewById(R.id.fragment_container);
         relativeLayout.setVisibility(View.VISIBLE);
         LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT
+        );
+        relativeLayout.setLayoutParams(param);
+    }
+    private void setUserFragmentMinWidth() {
+        RelativeLayout relativeLayout = findViewById(R.id.fragment_container2);
+        relativeLayout.setVisibility(View.VISIBLE);
+        LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                0.25f
+        );
+        relativeLayout.setLayoutParams(param);
+    }
+    private void setMessageFragmentMinWidth() {
+        RelativeLayout relativeLayout = findViewById(R.id.fragment_container);
+        relativeLayout.setVisibility(View.VISIBLE);
+        LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                0.75f
         );
         relativeLayout.setLayoutParams(param);
     }
@@ -193,12 +221,32 @@ public class ChatActivity extends AppCompatActivity {
         super.onConfigurationChanged(newConfig);
 
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            if(android.os.Build.VERSION.SDK_INT > 24) {
+                setMessageFragmentMinWidth();
+                setUserFragmentMinWidth();
+            }
             if (messageLogFragment != null) {
                 getSupportFragmentManager().beginTransaction().show(userListFragment).show(messageLogFragment).commit();
+
             }
 
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            getSupportFragmentManager().beginTransaction().addToBackStack(null).hide(userListFragment).commit();
+            if (android.os.Build.VERSION.SDK_INT > 24) {
+                if (messageLogFragment != null) {
+                    getSupportFragmentManager().beginTransaction().addToBackStack(null).hide(userListFragment).commit();
+                    setMessageListVisible();
+                } else {
+                    setUserFragmentMaxWidth();
+                }
+            }
+            else{
+                if (messageLogFragment != null) {
+                    getSupportFragmentManager().beginTransaction().addToBackStack(null).hide(userListFragment).commit();
+                }
+                else{
+                    setUserFragmentMaxWidth();
+                }
+            }
         }
     }
 
@@ -252,8 +300,13 @@ public class ChatActivity extends AppCompatActivity {
 
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        getSupportFragmentManager().putFragment(outState, Constants.LIST_FRAGMENT,
-                userListFragment);
+        if(userListFragment!=null) {
+            getSupportFragmentManager().putFragment(outState, Constants.LIST_FRAGMENT,
+                    userListFragment);
+        }
+        if (messageLogFragment!=null) {
+            getSupportFragmentManager().putFragment(outState, Constants.MESSAGE_FRAGMENT, messageLogFragment);
+        }
         outState.putParcelableArrayList(Constants.LIST_OF_USERS, listOfUsers);
     }
 

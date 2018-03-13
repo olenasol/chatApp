@@ -10,6 +10,7 @@ public class Constants {
     public static final String TWITTER_CLIENT_SECRET = "c3178fcae9514b2d8111300d9c2e7ed9";
     public static final String TWITTER_CALLBACK = "https://www.insdffgg";
     public static final String LIST_FRAGMENT = "list_of_users";
+    public static final String MESSAGE_FRAGMENT = "list_of_messages";
     public static final String TYPE_LOGIN = "login_type";
     public static final String BROADCAST_TEXT = "com.example.olena.chatapp.message";
     public static final String BROADCAST_MESSAGE = "message";
